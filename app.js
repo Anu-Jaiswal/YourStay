@@ -109,7 +109,7 @@ app.use("/listings", listingRouter);
 app.use("/listings/:id/reviews", reviewRouter);
 app.use("/", userRouter);
 
-aap.get("/", (req,res) => {
+app.get("/", (req,res) => {
     res.redirect("/listings");
 });
 
