@@ -1,6 +1,7 @@
 if(process.env.NODE_ENV !== "production"){
  require("dotenv").config();
 //  console.log("Map token", process.env.MAP_TOKEN);
+console.log("Cloud Name:", process.env.CLOUD_NAME);
 }
 
 const dns = require("dns");
