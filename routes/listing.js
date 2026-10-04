@@ -12,12 +12,23 @@ const upload = multer({ storage });
 router.route("/")
   
    .get(wrapAsync(listingController.index))
-   .post( 
+   .post(
     isLoggedIn,
-    upload.single("listing[image]"),
+
+    (req, res, next) => {
+        upload.single("listing[image]")(req, res, (err) => {
+            if (err) {
+                console.log("🔥 CLOUDINARY UPLOAD ERROR:");
+                console.log(err);
+                return next(err);
+            }
+            next();
+        });
+    },
+
     validateListing,
-     wrapAsync(listingController.createListing),
-    );
+    wrapAsync(listingController.createListing),
+)
 
      //New route
 router.get("/new",isLoggedIn, listingController.renderNewForm);

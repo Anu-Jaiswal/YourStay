@@ -1,5 +1,6 @@
 const Listing = require("../models/listing");
 const mbxGeocoding= require('@mapbox/mapbox-sdk/services/geocoding');
+const ExpressError = require("../util/ExpressError.js");
 const mapToken = process.env.MAP_TOKEN;
 const geocodingClient = mbxGeocoding({ accessToken: mapToken });
 
@@ -35,17 +36,18 @@ module.exports.createListing = async (req,res) =>{
   limit: 1
 })
   .send();
-  console.log(response.body.features[0].geometry);
-
-  let url = req.file.path;
-  let filename = req.file.filename;
+  const feature = response.body.features[0];
+  if (!feature) {
+    throw new ExpressError(400, "We couldn't find that location. Please enter a more specific location.");
+  }
   
   // let {tile, description, image, price, country, location} = req.body;
    const newListing = new Listing(req.body.listing);
    newListing.owner = req.user._id;
-   newListing.image = {url, filename};
-
-   newListing.geometry = response.body.features[0].geometry;
+   if (req.file) {
+     newListing.image = { url: req.file.path, filename: req.file.filename };
+   }
+   newListing.geometry = feature.geometry;
    let savedListing = await newListing.save();
    console.log(savedListing);
   req.flash("success", "New Listing Created")
